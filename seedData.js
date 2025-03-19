@@ -1,18 +1,18 @@
 const seedData = [
     {
-      id: Math.random() * 10000,
+      id: 1,
       name: "exp-1",
       type: "a/b",
       status: "paused"
     },
     {
-      id: Math.random() * 10000,
+      id: 2,
       name: "exp-2",
       type: "a/b",
       status: "paused"
     },
     {
-      id: Math.random() * 10000,
+      id: 3,
       name: "exp-3",
       type: "a/b",
       status: "paused"

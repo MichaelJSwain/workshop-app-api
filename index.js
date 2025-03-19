@@ -7,7 +7,14 @@ const datafile = require('./datafile.js');
 
 app.use(bodyParser.json());
 
-app.use(cors({origin: `http://localhost:5173`}))
+var corsOptions = {
+    origin: [`http://localhost:5173`,`http://localhost:5174`],
+    optionsSuccessStatus: 200 // For legacy browser support
+    }
+    
+    app.use(cors(corsOptions));
+
+// app.use(cors({origin: []`http://localhost:5173`, `http://localhost:5174/`]}))
 
 app.get("/api/:projectID/flags", (req, res) => {
     const {projectID} = req.params;
