@@ -2,13 +2,16 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const seedData = require('./seedData.js');
+const cors = require('cors');
 
 app.use(bodyParser.json());
+
+app.use(cors({origin: `http://localhost:5173`}))
 
 app.get("/api/:projectID/flags", (req, res) => {
     const {projectID} = req.params;
 
-    return res.json({message: "ok", data: seedData})
+    return res.json(seedData)
 });
 
 app.post("/api/:projectID/flags", (req, res) => {
