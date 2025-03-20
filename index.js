@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const seedData = require('./seedData.js');
 const cors = require('cors');
 const datafile = require('./datafile.js');
+const flag = require('./Models/Flag.js');
 
 app.use(bodyParser.json());
 
@@ -25,7 +26,12 @@ app.get("/api/:projectID/flags", (req, res) => {
 app.post("/api/:projectID/flags", (req, res) => {
     const {name, key, description} = req.body;
 
-    seedData.push({name, key, description});
+    const newFlag = flag(name, key, description);
+
+    console.log(newFlag);
+
+    // save to "db"
+    seedData.push(newFlag);
 
     return res.json({message: "ok", data: seedData})
 });
