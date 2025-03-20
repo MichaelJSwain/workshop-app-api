@@ -28,12 +28,18 @@ app.post("/api/:projectID/flags", (req, res) => {
 
     const newFlag = flag(name, key, description);
 
-    console.log(newFlag);
-
     // save to "db"
-    seedData.push(newFlag);
+    // try {
+        seedData.push(newFlag);
 
-    return res.json({message: "ok", data: seedData})
+        // if successful, update datafile
+        datafile.flags.push(newFlag);
+
+        return res.json({message: "ok", data: seedData})
+    // } catch(e) {
+    //     return res.json({message: "error", data: e.message})
+    // }
+
 });
 
 app.get("/cdn/:productID/:sdkKey", (req, res) => {
