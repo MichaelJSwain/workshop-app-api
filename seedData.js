@@ -1,4 +1,4 @@
-const seedData = [
+let seedData = [
     {
       key: 'exp_1',
       name: 'exp 1',

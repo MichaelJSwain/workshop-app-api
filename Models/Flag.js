@@ -1,5 +1,6 @@
 // placeholder func to imitate data modeling
 const flag = (name, key, description) => {
+  console.log("creating flag")
     const flag = {
         key,
         name,
