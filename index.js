@@ -53,6 +53,17 @@ app.get("/api/:projectID/flags/:flagID", (req, res) => {
     const foundFlag = seedData.flags.find(flag => flag.key === flagID);
     if (foundFlag) {
         console.log(foundFlag);
+
+        if (foundFlag.rules.length) {
+            // "populate" rules array
+            const populatedRules = foundFlag.rules.map(ruleKey => {
+                const foundRule = seedData.rules.find(ruleInDB => ruleInDB.key == ruleKey);
+                return foundRule;
+            })
+            foundFlag.rulesConfigs = populatedRules;
+        } else {
+            // no rules
+        }
         return res.json(foundFlag);
     }
     // handle error
