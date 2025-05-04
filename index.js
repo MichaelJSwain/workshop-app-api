@@ -5,6 +5,7 @@ let seedData = require('./seedData.js');
 const cors = require('cors');
 const datafile = require('./datafile.js');
 const flag = require('./Models/Flag.js');
+const rule = require('./Models/Rule.js');
 
 app.use(bodyParser.json());
 
@@ -49,7 +50,6 @@ app.get("/cdn/:productID/:sdkKey", (req, res) => {
 
 app.get("/api/:projectID/flags/:flagID", (req, res) => {
     const {flagID} = req.params;
-    console.log("finding flag = ", flagID);
     const foundFlag = seedData.flags.find(flag => flag.key === flagID);
     if (foundFlag) {
         console.log(foundFlag);
@@ -95,16 +95,19 @@ app.delete("/api/:projectID/flags/:flagID", (req, res) => {
 
 app.post("/api/:projectID/rules", (req, res) => {
     // "create" rule and "save" to db
-    const newRule = req.body;
+    const ruleConfig = req.body;
+    const newRule = rule(ruleConfig);
     seedData.rules.push(newRule);
-
+    
     // add rule key as reference in flag
     const linkedFlag = seedData.flags.find(flag => {return flag.key === newRule.linkedFlag});
     if (linkedFlag) {
         linkedFlag.rules.push(newRule.key);
+        console.log("seed data = ", seedData);
         return res.json(newRule);
     }
     // else handle error...
+    
 });
 
 app.listen("8080", () => {
