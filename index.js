@@ -93,6 +93,20 @@ app.delete("/api/:projectID/flags/:flagID", (req, res) => {
     return res.json(filteredFlags);
 });
 
+app.post("/api/:projectID/rules", (req, res) => {
+    // "create" rule and "save" to db
+    const newRule = req.body;
+    seedData.rules.push(newRule);
+
+    // add rule key as reference in flag
+    const linkedFlag = seedData.flags.find(flag => {return flag.key === newRule.linkedFlag});
+    if (linkedFlag) {
+        linkedFlag.rules.push(newRule.key);
+        return res.json(newRule);
+    }
+    // else handle error...
+});
+
 app.listen("8080", () => {
     console.log("app listening on port 8080");
 });
