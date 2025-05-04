@@ -20,7 +20,7 @@ var corsOptions = {
 app.get("/api/:projectID/flags", (req, res) => {
     const {projectID} = req.params;
 
-    return res.json(seedData)
+    return res.json(seedData.flags)
 });
 
 app.post("/api/:projectID/flags", (req, res) => {
@@ -31,12 +31,12 @@ app.post("/api/:projectID/flags", (req, res) => {
     datafile.flags.push(newFlag);
     // save to "db"
     // try {
-        seedData.push(newFlag);
+        seedData.flags.push(newFlag);
 
         // if successful, update datafile
         
 
-        return res.json({message: "ok", data: seedData})
+        return res.json({message: "ok", data: seedData.flags})
     // } catch(e) {
     //     return res.json({message: "error", data: e.message})
     // }
@@ -45,6 +45,18 @@ app.post("/api/:projectID/flags", (req, res) => {
 
 app.get("/cdn/:productID/:sdkKey", (req, res) => {
     return res.json(datafile);
+});
+
+app.get("/api/:projectID/flags/:flagID", (req, res) => {
+    const {flagID} = req.params;
+    console.log("finding flag = ", flagID);
+    const foundFlag = seedData.flags.find(flag => flag.key === flagID);
+    if (foundFlag) {
+        console.log(foundFlag);
+        return res.json(foundFlag);
+    }
+    // handle error
+    return null;
 });
 
 app.patch("/api/:projectID/flags/:flagID", (req, res) => {
@@ -70,8 +82,8 @@ app.delete("/api/:projectID/flags/:flagID", (req, res) => {
     const {flagID} = req.params;
 
     // find flag in DB
-    const filteredFlags = seedData.filter(flag => flag.id != flagID);
-    seedData = filteredFlags
+    const filteredFlags = seedData.flags.filter(flag => flag.id != flagID);
+    seedData.flags = filteredFlags
 
     // // update datafile
     // datafile.flags = filteredFlags;

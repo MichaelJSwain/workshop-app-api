@@ -1,4 +1,5 @@
-let seedData = [
+let seedData = {
+  flags: [
     {
       key: 'exp_1',
       name: 'exp 1',
@@ -23,6 +24,8 @@ let seedData = [
       project_id: 29170930006,
       account_id: 29170930006
     }
-  ];
+  ],
+  rules: []
+};
 
 module.exports = seedData;
