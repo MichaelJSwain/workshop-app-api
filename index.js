@@ -121,6 +121,22 @@ app.post("/api/:projectID/rules", (req, res) => {
     
 });
 
+app.patch("/api/:projectID/rules", (req, res) => {
+    const updatedRule = req.body;
+    const updatedRules = seedData.rules.map(rule => {
+        return rule.id == updatedRule.id ? updatedRule : rule;
+    });
+    seedData.rules = updatedRules;
+    return res.json({
+            "status": "success",
+            "message": "Rule updated successfully",
+            "data": {
+            "rule": updatedRule
+        }
+        }
+      );
+});
+
 app.listen("8080", () => {
     console.log("app listening on port 8080");
 });
