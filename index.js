@@ -137,6 +137,37 @@ app.patch("/api/:projectID/rules", (req, res) => {
       );
 });
 
+app.delete("/api/:projectID/flags/:flagId/rules/:ruleId", (req, res) => {
+    const {flagId, ruleId} = req.params;
+
+    // remove reference to key for deleted rule from flag
+    const foundRule = seedData.rules.find(rule => rule.id === parseInt(ruleId));
+    if (foundRule) {
+        console.log("found rule = ", foundRule);
+        // find linked flag and delete reference to rule on the flag
+        const filteredFlags = seedData.flags.filter(flag => {
+            
+            if (flag.key === foundRule.linkedFlag) {
+                
+                const updatedFlagRules = flag.rules.filter(ruleKey => ruleKey !== foundRule.key);
+                flag.rules = updatedFlagRules;
+                
+                    const updatedRuleConfigs = flag.rulesConfigs.filter(config => config.key !== foundRule.key);
+                    
+                    flag.rulesConfigs = updatedRuleConfigs;
+                
+                
+            }
+            return flag
+        });
+        seedData.flags = filteredFlags;
+    }
+
+    // delete rule
+        const updatedRules = seedData.rules.filter(rule => rule.id !== parseInt(ruleId));
+        seedData.rules = updatedRules;
+});
+
 app.listen("8080", () => {
     console.log("app listening on port 8080");
 });
