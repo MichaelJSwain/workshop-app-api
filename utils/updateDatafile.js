@@ -6,12 +6,12 @@ export const addNewFlagToDatafile = (newFlag) => {
 
 export const toggleFlagStatusInDatafile = (updatedFlags) => {
     datafile.flags = updatedFlags;
-    console.log("datafile after toggling flag status = ", datafile.flags);
+    
 }
 
 export const deleteFlagInDatafile = (updatedFlags) => {
     datafile.flags = updatedFlags;
-    console.log("datafile after deleting flag = ", datafile.flags);
+    
 }
 
 export const addNewRuleInDatafile = (newRule) => {
@@ -35,5 +35,5 @@ export const deleteRuleInDatafile = (rule) => {
         }
         return flag
     })
-    console.log("datafile after deleting rule = ", datafile);
+    
 }
