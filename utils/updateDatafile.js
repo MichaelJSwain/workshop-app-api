@@ -4,14 +4,22 @@ export const addNewFlagToDatafile = (newFlag) => {
     datafile.flags.push(newFlag);
 }
 
-export const toggleFlagStatusInDatafile = (updatedFlags) => {
-    datafile.flags = updatedFlags;
+export const toggleFlagStatusInDatafile = (flagID) => {
     
 }
 
-export const deleteFlagInDatafile = (updatedFlags) => {
+export const deleteFlagInDatafile = (flagID) => {
+    // delete any associated rules
+    const foundFlag = datafile.flags.find(f => f.id == flagID);
+    if (foundFlag.rules.length) {
+        const updatedRules = datafile.rules.filter(rule => {
+           return !foundFlag.rules.some(ruleKey => ruleKey == rule.key)
+        })
+        datafile.rules = updatedRules;
+    }
+
+    const updatedFlags = datafile.flags.filter(f => f.id != flagID);
     datafile.flags = updatedFlags;
-    
 }
 
 export const addNewRuleInDatafile = (newRule) => {
@@ -22,6 +30,16 @@ export const addNewRuleInDatafile = (newRule) => {
         }
         return flag;
     });
+}
+
+export const updateRuleInDatafile = (updatedRule) => {
+    const updatedRules = datafile.rules.map(r => {
+        if (r.id == updatedRule.id) {
+            return updatedRule;
+        }
+        return r;
+    })
+    datafile.rules = updatedRules;
 }
 
 export const deleteRuleInDatafile = (rule) => {
