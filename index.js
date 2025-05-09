@@ -6,6 +6,7 @@ const cors = require('cors');
 const datafile = require('./datafile.js');
 const flag = require('./Models/Flag.js');
 const rule = require('./Models/Rule.js');
+const { addNewFlagToDatafile, toggleFlagStatusInDatafile, deleteFlagInDatafile, addNewRuleInDatafile, deleteRuleInDatafile } = require('./utils/updateDatafile.js');
 
 app.use(bodyParser.json());
 
@@ -28,20 +29,12 @@ app.post("/api/:projectID/flags", (req, res) => {
     const {name, key, description} = req.body;
 
     const newFlag = flag(name, key, description);
-    console.log('new flag ', newFlag);
-    datafile.flags.push(newFlag);
+    
     // save to "db"
-    // try {
-        seedData.flags.push(newFlag);
+    seedData.flags.push(newFlag);
 
-        // if successful, update datafile
-        
-
+    // if successful, update datafile
         return res.json({message: "ok", data: seedData.flags})
-    // } catch(e) {
-    //     return res.json({message: "error", data: e.message})
-    // }
-
 });
 
 app.get("/cdn/:productID/:sdkKey", (req, res) => {
@@ -52,7 +45,7 @@ app.get("/api/:projectID/flags/:flagID", (req, res) => {
     const {flagID} = req.params;
     const foundFlag = seedData.flags.find(flag => flag.key === flagID);
     if (foundFlag) {
-        console.log(foundFlag);
+        console.log("fetched flag = ", foundFlag);        
 
         if (foundFlag.rules.length) {
             // "populate" rules array
@@ -83,8 +76,6 @@ app.patch("/api/:projectID/flags/:flagID", (req, res) => {
         return copy;            
     })
 
-    // datafile.flags = copyFlags;
-    // console.log('datafile updated =', datafile);
     return res.json("successfully toggle exp")
 })
 
@@ -97,28 +88,35 @@ app.delete("/api/:projectID/flags/:flagID", (req, res) => {
     seedData.flags = filteredFlags
 
     // // update datafile
-    // datafile.flags = filteredFlags;
-    // const copy = datafile.flags.filter(flag => flag.id != flagID);
-    // datafile.flags = copy;
     
     return res.json(filteredFlags);
 });
 
 app.post("/api/:projectID/rules", (req, res) => {
-    // "create" rule and "save" to db
     const ruleConfig = req.body;
+    
+    // "create" rule and "save" to db
     const newRule = rule(ruleConfig);
-    seedData.rules.push(newRule);
-    
-    // add rule key as reference in flag
-    const linkedFlag = seedData.flags.find(flag => {return flag.key === newRule.linkedFlag});
-    if (linkedFlag) {
-        linkedFlag.rules.push(newRule.key);
-        console.log("seed data = ", seedData);
-        return res.json(newRule);
+    if (!seedData.rules.includes(ruleConfig.key)) {
+        seedData.rules.push(newRule);    
     }
+
+    // add rule key as reference in flag
+    const copyFlags = seedData.flags.map(f => {
+        if (f.key === newRule.linkedFlag) {
+            f.rules.push(newRule.key);
+        }
+        return f;
+    })
+    seedData.flags = copyFlags;
+  
+      // updated datafile
+
+    return res.json(newRule);
+
     // else handle error...
-    
+
+
 });
 
 app.patch("/api/:projectID/rules", (req, res) => {
@@ -143,7 +141,7 @@ app.delete("/api/:projectID/flags/:flagId/rules/:ruleId", (req, res) => {
     // remove reference to key for deleted rule from flag
     const foundRule = seedData.rules.find(rule => rule.id === parseInt(ruleId));
     if (foundRule) {
-        console.log("found rule = ", foundRule);
+        
         // find linked flag and delete reference to rule on the flag
         const filteredFlags = seedData.flags.filter(flag => {
             
@@ -166,6 +164,10 @@ app.delete("/api/:projectID/flags/:flagId/rules/:ruleId", (req, res) => {
     // delete rule
         const updatedRules = seedData.rules.filter(rule => rule.id !== parseInt(ruleId));
         seedData.rules = updatedRules;
+
+        // update datafile
+
+        return res.json({status: "success"})
 });
 
 app.listen("8080", () => {

@@ -25,7 +25,8 @@ const datafile = {
       id: 5777793,
       project_id: 29170930006,
       account_id: 29170930006
-    }]
+    }],
+    rules: []
 }
 
 module.exports = datafile;
