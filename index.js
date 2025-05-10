@@ -6,7 +6,7 @@ const cors = require('cors');
 const datafile = require('./datafile.js');
 const flag = require('./Models/Flag.js');
 const rule = require('./Models/Rule.js');
-const { addNewFlagToDatafile, toggleFlagStatusInDatafile, deleteFlagInDatafile, addNewRuleInDatafile, deleteRuleInDatafile } = require('./utils/updateDatafile.js');
+const { addNewFlagToDatafile, toggleFlagStatusInDatafile, deleteFlagInDatafile, addNewRuleInDatafile, deleteRuleInDatafile, updateRuleInDatafile } = require('./utils/updateDatafile.js');
 
 app.use(bodyParser.json());
 
@@ -34,6 +34,8 @@ app.post("/api/:projectID/flags", (req, res) => {
     seedData.flags.push(newFlag);
 
     // if successful, update datafile
+    addNewFlagToDatafile(newFlag);
+
         return res.json({message: "ok", data: seedData.flags})
 });
 
@@ -66,15 +68,32 @@ app.get("/api/:projectID/flags/:flagID", (req, res) => {
 app.patch("/api/:projectID/flags/:flagID", (req, res) => {
     const {projectID, flagID} = req.params;
 
-    const copyFlags = datafile.flags.map(flag => {
-        const copy = flag.id == flagID ? 
-                    {
-                        ...flag, 
-                        status: flag.status === "running" ? "paused" : "running"
-                    } :
-                    {...flag};
-        return copy;            
+    const updatedSeedFlags = seedData.flags.map(flag => {
+        if (flag.id == flagID) {
+            return {
+                ...flag,
+                enabled: flag.status === "running" ? false : true, 
+                status: flag.status === "running" ? "paused" : "running"
+            }
+        }
+                
+        return flag;   
+    });
+    seedData.flags = updatedSeedFlags;
+
+    // update datafile
+    const updatedFlags = datafile.flags.map(flag => {
+        if (flag.id == flagID) {
+            return {
+                ...flag,
+                enabled: flag.status === "running" ? false : true, 
+                status: flag.status === "running" ? "paused" : "running"
+            }
+        }
+                
+        return flag;            
     })
+    datafile.flags = updatedFlags;
 
     return res.json("successfully toggle exp")
 })
@@ -88,6 +107,7 @@ app.delete("/api/:projectID/flags/:flagID", (req, res) => {
     seedData.flags = filteredFlags
 
     // // update datafile
+    deleteFlagInDatafile(flagID)
     
     return res.json(filteredFlags);
 });
@@ -111,6 +131,7 @@ app.post("/api/:projectID/rules", (req, res) => {
     seedData.flags = copyFlags;
   
       // updated datafile
+      addNewRuleInDatafile(newRule)
 
     return res.json(newRule);
 
@@ -125,6 +146,10 @@ app.patch("/api/:projectID/rules", (req, res) => {
         return rule.id == updatedRule.id ? updatedRule : rule;
     });
     seedData.rules = updatedRules;
+
+    // update datafile
+    updateRuleInDatafile(updatedRule);
+
     return res.json({
             "status": "success",
             "message": "Rule updated successfully",
@@ -166,6 +191,7 @@ app.delete("/api/:projectID/flags/:flagId/rules/:ruleId", (req, res) => {
         seedData.rules = updatedRules;
 
         // update datafile
+        deleteRuleInDatafile(foundRule)
 
         return res.json({status: "success"})
 });
